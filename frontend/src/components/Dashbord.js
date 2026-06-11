@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import TaskList from './TaskList';
@@ -13,15 +13,8 @@ function Dashboard() {
   const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    } else {
-      fetchTasks();
-    }
-  }, [isAuthenticated, navigate, statusFilter]);
-
-  const fetchTasks = async () => {
+  // Wrap fetchTasks in useCallback to prevent infinite re-renders
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getTasks(statusFilter);
@@ -33,7 +26,15 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]); // Re-create fetchTasks when statusFilter changes
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      fetchTasks();
+    }
+  }, [isAuthenticated, navigate, fetchTasks]); 
 
   const handleTaskCreated = () => {
     fetchTasks();
