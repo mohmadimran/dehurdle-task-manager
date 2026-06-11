@@ -7,6 +7,7 @@ const app = express();
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth");
+const taskRoutes = require("./routes/task");
 
 // Connect Database
 connectDB();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
 
 // 404 Handler
 app.use((req, res) => {
